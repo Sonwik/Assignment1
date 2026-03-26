@@ -5,17 +5,17 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         // 1
-        //System.out.println("Задача 1 (n=4): " + sumSquares(4));
+        //System.out.println("Ex 1 (n=4): " + sumSquares(4));
 
         // 2
         //int[] testArray = {1, 2, 3, 4, 5};
-        //System.out.println("Задача 2 (sum of array): " + sumArray(testArray, 5));
+        //System.out.println("Ex 2 (sum of array): " + sumArray(testArray, 5));
 
         // 3
-        //System.out.println("Задача 3 (n=10): " + sumN(10));
+        //System.out.println("Ex 3 (n=10): " + sumN(10));
 
         // 4
-        //System.out.println("Задача 4 (b=4, n=3): " + sumPowers(4, 3));
+        //System.out.println("Ex 4 (b=4, n=3): " + sumPowers(4, 3));
 
         // 5
         // System.out.println("Ex 5 ():");
