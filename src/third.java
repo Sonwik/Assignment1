@@ -3,20 +3,12 @@ public class third {
 
     public Stack<Integer> sortStack(Stack<Integer> input) {
         Stack<Integer> tempStack = new Stack<>();
-
         while (!input.isEmpty()) {
             int temp = input.pop();
-
             while (!tempStack.isEmpty() && tempStack.peek() < temp) {
                 input.push(tempStack.pop());
             }
             tempStack.push(temp);
         }
-
-        while (!tempStack.isEmpty()) {
-            input.push(tempStack.pop());
-        }
-
-        return input;
-    }
-}
+        return tempStack;
+    }}
