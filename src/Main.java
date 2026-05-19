@@ -1,139 +1,189 @@
-import java.util.Scanner;
+import java.util.*;
+
+class Edge {
+    char target;
+    int weight;
+
+    public Edge(char target, int weight) {
+        this.target = target;
+        this.weight = weight;
+    }
+}
+
+class PQNode implements Comparable<PQNode> {
+    char vertex;
+    int distance;
+
+    public PQNode(char vertex, int distance) {
+        this.vertex = vertex;
+        this.distance = distance;
+    }
+
+    @Override
+    public int compareTo(PQNode other) {
+        return Integer.compare(this.distance, other.distance);
+    }
+}
+
+class Graph {
+    private final Map<Character, List<Edge>> adjList;
+
+    public Graph() {
+        this.adjList = new TreeMap<>();
+    }
+
+    public void addVertex(char v) {
+        adjList.putIfAbsent(v, new ArrayList<>());
+    }
+
+    public void addEdge(char v, char w, int weight) {
+        addVertex(v);
+        addVertex(w);
+        adjList.get(v).add(new Edge(w, weight));
+        adjList.get(w).add(new Edge(v, weight));
+    }
+
+    public void printGraph() {
+        System.out.println("Task 1: Graph Representation (Adjacency List)");
+        for (Map.Entry<Character, List<Edge>> entry : adjList.entrySet()) {
+            System.out.print(entry.getKey() + " -> [");
+            List<Edge> edges = entry.getValue();
+            for (int i = 0; i < edges.size(); i++) {
+                System.out.print("(" + edges.get(i).target + ", " + edges.get(i).weight + ")");
+                if (i < edges.size() - 1) System.out.print(", ");
+            }
+            System.out.println("]");
+        }
+        System.out.println();
+    }
+
+    public void bfs(char startNode) {
+        System.out.println(" Task 2: BFS Traversal (Starting from " + startNode + ")");
+        if (!adjList.containsKey(startNode)) return;
+
+        Queue<Character> queue = new LinkedList<>();
+        Set<Character> visited = new HashSet<>();
+        List<String> order = new ArrayList<>();
+
+        queue.add(startNode);
+        visited.add(startNode);
+
+        while (!queue.isEmpty()) {
+            char current = queue.poll();
+            order.add(String.valueOf(current));
+
+            List<Edge> neighbors = new ArrayList<>(adjList.get(current));
+            neighbors.sort(Comparator.comparingInt(e -> e.target));
+
+            for (Edge edge : neighbors) {
+                if (!visited.contains(edge.target)) {
+                    visited.add(edge.target);
+                    queue.add(edge.target);
+                }
+            }
+        }
+        System.out.println(String.join(" -> ", order) + "\n");
+    }
+
+    public void dfs(char startNode) {
+        System.out.println("Task 2: DFS Traversal (Starting from " + startNode + ") ");
+        if (!adjList.containsKey(startNode)) return;
+
+        Set<Character> visited = new HashSet<>();
+        List<String> order = new ArrayList<>();
+
+        dfsHelper(startNode, visited, order);
+
+        System.out.println(String.join(" -> ", order) + "\n");
+    }
+
+    private void dfsHelper(char current, Set<Character> visited, List<String> order) {
+        visited.add(current);
+        order.add(String.valueOf(current));
+
+        List<Edge> neighbors = new ArrayList<>(adjList.get(current));
+        neighbors.sort(Comparator.comparingInt(e -> e.target));
+
+        for (Edge edge : neighbors) {
+            if (!visited.contains(edge.target)) {
+                dfsHelper(edge.target, visited, order);
+            }
+        }
+    }
+
+    public void dijkstra(char source) {
+        System.out.println("Task 3: Shortest Path (Dijkstra from " + source + ")");
+
+        Map<Character, Integer> distances = new HashMap<>();
+        Map<Character, Character> parentNodes = new HashMap<>();
+        PriorityQueue<PQNode> minHeap = new PriorityQueue<>();
+
+        for (char vertex : adjList.keySet()) {
+            distances.put(vertex, Integer.MAX_VALUE);
+        }
+        distances.put(source, 0);
+        minHeap.add(new PQNode(source, 0));
+
+        while (!minHeap.isEmpty()) {
+            PQNode curr = minHeap.poll();
+            char u = curr.vertex;
+
+            if (curr.distance > distances.get(u)) continue;
+
+            for (Edge edge : adjList.get(u)) {
+                char v = edge.target;
+                int weight = edge.weight;
+                int newDist = distances.get(u) + weight;
+
+                if (newDist < distances.get(v)) {
+                    distances.put(v, newDist);
+                    parentNodes.put(v, u);
+                    minHeap.add(new PQNode(v, newDist));
+                }
+            }
+        }
+
+        for (char vertex : adjList.keySet()) {
+            System.out.print("To " + vertex + " : Distance = ");
+            if (distances.get(vertex) == Integer.MAX_VALUE) {
+                System.out.println("Unreachable");
+            } else {
+                System.out.print(distances.get(vertex) + ", Path: ");
+                printPath(vertex, parentNodes);
+                System.out.println();
+            }
+        }
+    }
+
+    private void printPath(char vertex, Map<Character, Character> parentNodes) {
+        LinkedList<Character> path = new LinkedList<>();
+        Character curr = vertex;
+        while (curr != null) {
+            path.addFirst(curr);
+            curr = parentNodes.get(curr);
+        }
+        for (int i = 0; i < path.size(); i++) {
+            System.out.print(path.get(i));
+            if (i < path.size() - 1) System.out.print(" -> ");
+        }
+    }
+}
 
 public class Main {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+        Graph graph = new Graph();
 
-        // 1
-        //System.out.println("Ex 1 (n=4): " + sumSquares(4));
+        graph.addEdge('B', 'A', 15);
+        graph.addEdge('C', 'A', 5);
+        graph.addEdge('D', 'B', 13);
+        graph.addEdge('E', 'A', 8);
+        graph.addEdge('E', 'B', 2);
+        graph.addEdge('B', 'C', 4);
 
-        // 2
-        //int[] testArray = {1, 2, 3, 4, 5};
-        //System.out.println("Ex 2 (sum of array): " + sumArray(testArray, 5));
 
-        // 3
-        //System.out.println("Ex 3 (n=10): " + sumN(10));
-
-        // 4
-        //System.out.println("Ex 4 (b=4, n=3): " + sumPowers(4, 3));
-
-        // 5
-        // System.out.println("Ex 5 ():");
-        // reverseSequence(sc.nextInt(), sc);
-
-        // 6
-        // System.out.println("\nEx 6 ():");
-        // reverseStrings(sc.nextInt(), sc);
-
-        // 7
-        System.out.println("\nEx 7 (Spiral 3x3):");
-        int n7 = 3;
-        int[][] matrix = new int[n7][n7];
-        fillSpiral(matrix, 1, 0, 0, n7);
-        for (int i = 0; i < n7; i++) {
-            for (int j = 0; j < n7; j++) System.out.print(matrix[i][j] + " ");
-            System.out.println();
-        }
-
-        // 8
-        //System.out.println("\nEx 8 (n=2, k=3):");
-        //allSequences(2, 3, "");
-
-        // 9
-        //System.out.println("\nEx 9 (Permutations of AB):");
-        //permutations("AB", "");
-        // 10
-        //System.out.println("\nEx 10:");
-        //int num1 = 16;
-        //System.out.println(num1 + " is power of two? " + isPowerOfTwo(num1));
-        //int num2 = 10;
-        //System.out.println(num2 + " is power of two? " + isPowerOfTwo(num2));
+        graph.printGraph();
+        graph.bfs('D');
+        graph.dfs('D');
+        graph.dijkstra('A');
     }
-
-    // 1
-    public static int sumSquares(int n) {
-        if (n == 1) return 1;
-        return (n * n) + sumSquares(n - 1);
-    }
-
-    // 2
-    public static int sumArray(int[] arr, int n) {
-        if (n <= 0) return 0;
-        return arr[n - 1] + sumArray(arr, n - 1);
-    }
-
-    // 3
-    public static int sumN(int n) {
-        if (n <= 1) return n;
-        return n + sumN(n - 1);
-    }
-
-    // 4
-    public static int sumPowers(int b, int n) {
-        if (n == 0) return 1;
-        int power = 1;
-        for(int i = 0; i < n; i++) power *= b;
-        return power + sumPowers(b, n - 1);
-    }
-
-    // 5
-    public static void reverseSequence(int n, Scanner sc) {
-        if (n == 0) return;
-        int val = sc.nextInt();
-        reverseSequence(n - 1, sc);
-        System.out.print(val + " ");
-    }
-
-    // 6
-    public static void reverseStrings(int n, Scanner sc) {
-        if (n == 0) return;
-        char[] currentStr = sc.next().toCharArray();
-        reverseStrings(n - 1, sc);
-        System.out.println(String.valueOf(currentStr));
-    }
-
-    // 7
-    public static void fillSpiral(int[][] mat, int v, int r, int c, int size) {
-        if (size <= 0) return;
-        if (size == 1) { mat[r][c] = v; return; }
-        for (int i = 0; i < size - 1; i++) mat[r][c + i] = v++;
-        for (int i = 0; i < size - 1; i++) mat[r + i][c + size - 1] = v++;
-        for (int i = 0; i < size - 1; i++) mat[r + size - 1][c + size - 1 - i] = v++;
-        for (int i = 0; i < size - 1; i++) mat[r + size - 1 - i][c] = v++;
-        fillSpiral(mat, v, r + 1, c + 1, size - 2);
-    }
-
-    // 8
-    public static void allSequences(int n, int k, String res) {
-        if (n == 0) {
-            System.out.println(res);
-            return;
-        }
-        for (int i = 1; i <= k; i++) {
-            allSequences(n - 1, k, res + i);
-        }
-    }
-
-    // 9
-    public static void permutations(String str, String res) {
-        if (str.isEmpty()) {
-            System.out.println(res);
-            return;
-        }
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            String remaining = str.substring(0, i) + str.substring(i + 1);
-            permutations(remaining, res + ch);
-        }
-    }
-
-    // 10
-    public static boolean isPowerOfTwo(int n) {
-        if (n <= 0) return false;
-        if (n == 1) return true;
-        if (n % 2 != 0) return false;
-        return isPowerOfTwo(n / 2);
-    }
-
-
-    }
+}
